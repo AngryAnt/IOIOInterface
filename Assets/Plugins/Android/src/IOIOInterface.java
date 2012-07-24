@@ -1,25 +1,53 @@
 package org.AngryAnt.IOIO;
 
-import com.unity3d.player.UnityPlayer;
+
+import org.AngryAnt.IOIO.*;
+import com.unity3d.player.*;
+import ioio.lib.api.*;
 
 
 public class IOIOInterface
 {
-	private static String m_ControllerName;
+	private static String s_ControllerName;
+	private static IOIO s_IOIO;
+
+
+	private static void MessageController (String function, String message)
+	{
+		UnityPlayer.UnitySendMessage (s_ControllerName, function, message);
+	}
 
 
 	public static void Start (String sender)
 	{
-		m_ControllerName = sender;
+		s_ControllerName = sender;
 
-		System.out.println ("IOIOInterface started from controller: " + m_ControllerName);
+		s_IOIO = IOIOFactory.create ();
 
 		MessageController ("OnInterfaceStart", "");
 	}
 
 
-	private static void MessageController (String function, String message)
+	public static void Connect ()
 	{
-		UnityPlayer.UnitySendMessage (m_ControllerName, function, message);
+		IOIOWaitThread.Wait (s_IOIO, IOIOWaitThread.WaitTask.Connect);
+	}
+
+
+	public static void OnIOIOConnected ()
+	{
+		MessageController ("OnIOIOConnected", "");
+	}
+
+
+	public static void Disconnect ()
+	{
+		IOIOWaitThread.Wait (s_IOIO, IOIOWaitThread.WaitTask.Disconnect);
+	}
+
+
+	public static void OnIOIODisconnected ()
+	{
+		MessageController ("OnIOIODisconnected", "");
 	}
 }

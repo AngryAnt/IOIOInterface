@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 print ("Building Java class...\n");
-system ("javac IOIOInterface.java -bootclasspath /android-sdk-mac_86/platforms/android-8/android.jar -d . -classpath /Applications/Unity/Unity.app/Contents/PlaybackEngines/AndroidPlayer/bin/classes.jar");
+system ("javac *.java -bootclasspath /android-sdk-mac_86/platforms/android-8/android.jar -classpath ../IOIOLib.jar:/Applications/Unity/Unity.app/Contents/PlaybackEngines/AndroidPlayer/bin/classes.jar -d .");
 
 print ("Creating signature...\n");
 system ("javap -s org.AngryAnt.IOIO.IOIOInterface");
