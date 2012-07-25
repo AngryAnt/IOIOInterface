@@ -59,15 +59,16 @@ public class IOIOWaitThread extends Thread
 		}
 		catch (ConnectionLostException e)
 		{
-			// TODO: Exception handling
+			IOIOInterface.Log ("Lost connection during IOIOWaitThread (" + m_Task + ")");
+			IOIOInterface.OnIOIODisconnected ();
 		}
 		catch (IncompatibilityException e)
 		{
-			// TODO: Exception handling
+			IOIOInterface.Log ("Incompatibility detected during IOIOWaitThread (" + m_Task + ")");
+			IOIOInterface.OnIOIOIncompatible ();
 		}
-		catch (Exception e)
-		{
-			// TODO: Exception handling
-		}
+		catch (InterruptedException e)
+		// This one is most likely our own doing
+		{}
 	}
 }

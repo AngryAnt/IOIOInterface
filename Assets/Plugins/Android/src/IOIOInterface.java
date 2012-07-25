@@ -20,6 +20,12 @@ public class IOIOInterface
 	}
 
 
+	public static void Log (String message)
+	{
+		MessageController ("Log", message);
+	}
+
+
 	public static void Start (String sender)
 	{
 		s_ControllerName = sender;
@@ -36,21 +42,9 @@ public class IOIOInterface
 	}
 
 
-	public static void OnIOIOConnected ()
-	{
-		MessageController ("OnIOIOConnected", "");
-	}
-
-
 	public static void Disconnect ()
 	{
 		IOIOWaitThread.Wait (s_IOIO, IOIOWaitThread.WaitTask.Disconnect);
-	}
-
-
-	public static void OnIOIODisconnected ()
-	{
-		MessageController ("OnIOIODisconnected", "");
 	}
 
 
@@ -75,7 +69,8 @@ public class IOIOInterface
 		}
 		catch (ConnectionLostException e)
 		{
-			// TODO: Exception handling
+			Log ("Lost connection during ToggleDigitalOutput");
+			OnIOIODisconnected ();
 		}
 	}
 
@@ -83,5 +78,23 @@ public class IOIOInterface
 	public static void ClosePort (int pin)
 	{
 		s_Ports[pin].close ();
+	}
+
+
+	public static void OnIOIOConnected ()
+	{
+		MessageController ("OnIOIOConnected", "");
+	}
+
+
+	public static void OnIOIODisconnected ()
+	{
+		MessageController ("OnIOIODisconnected", "");
+	}
+
+
+	public static void OnIOIOIncompatible ()
+	{
+		MessageController ("OnIOIOIncompatible", "");
 	}
 }

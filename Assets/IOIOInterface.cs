@@ -42,14 +42,9 @@ public class IOIOInterface : MonoBehaviour
 	}
 
 
-	void OnInterfaceStart ()
+	public void Log (string message)
 	{
-		Debug.Log ("Interface is now running");
-
-		if (connectOnStart)
-		{
-			Connect ();
-		}
+		Debug.Log ("IOIO: " + message);
 	}
 
 
@@ -59,21 +54,9 @@ public class IOIOInterface : MonoBehaviour
 	}
 
 
-	void OnIOIOConnected ()
-	{
-		Debug.Log ("IOIO board connected");
-	}
-
-
 	public void Disconnect ()
 	{
 		JavaCall ("Disconnect");
-	}
-
-
-	void OnIOIODisconnected ()
-	{
-		Debug.Log ("IOIO board disconnected");
 	}
 
 
@@ -86,5 +69,34 @@ public class IOIOInterface : MonoBehaviour
 	public void ClosePort (int pin)
 	{
 		JavaCall ("ClosePort");
+	}
+
+
+	void OnInterfaceStart ()
+	{
+		Debug.Log ("Interface is now running");
+
+		if (connectOnStart)
+		{
+			Connect ();
+		}
+	}
+
+
+	void OnIOIOConnected ()
+	{
+		Debug.Log ("IOIO board connected");
+	}
+
+
+	void OnIOIODisconnected ()
+	{
+		Debug.Log ("IOIO board disconnected");
+	}
+
+
+	void OnIOIOIncompatible ()
+	{
+		Debug.Log ("IOIO board incompatibility detection");
 	}
 }
