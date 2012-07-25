@@ -63,4 +63,28 @@ public class IOIOInterface : MonoBehaviour
 	{
 		Debug.Log ("IOIO board connected");
 	}
+
+
+	public void Disconnect ()
+	{
+		JavaCall ("Disconnect");
+	}
+
+
+	void OnIOIODisconnected ()
+	{
+		Debug.Log ("IOIO board disconnected");
+	}
+
+
+	public void ToggleDigitalOutput (int pin, bool value = false)
+	{
+		JavaCall ("ToggleDigitalOutput", pin, value);
+	}
+
+
+	public void ClosePort (int pin)
+	{
+		JavaCall ("ClosePort");
+	}
 }

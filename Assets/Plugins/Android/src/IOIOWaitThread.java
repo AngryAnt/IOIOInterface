@@ -3,6 +3,7 @@ package org.AngryAnt.IOIO;
 
 import org.AngryAnt.IOIO.*;
 import ioio.lib.api.*;
+import ioio.lib.api.exception.*;
 
 
 public class IOIOWaitThread extends Thread
@@ -56,11 +57,11 @@ public class IOIOWaitThread extends Thread
 				break;
 			}
 		}
-		catch (ioio.lib.api.exception.ConnectionLostException e)
+		catch (ConnectionLostException e)
 		{
 			// TODO: Exception handling
 		}
-		catch (ioio.lib.api.exception.IncompatibilityException e)
+		catch (IncompatibilityException e)
 		{
 			// TODO: Exception handling
 		}

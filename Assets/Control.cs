@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 
+[RequireComponent (typeof (IOIOInterface))]
 public class Control : MonoBehaviour
 {
 	const int kMaxLogLines = 10;
@@ -14,6 +15,7 @@ public class Control : MonoBehaviour
 	GUIStyle bigLabel;
 	bool interactive = false;
 	List<string> log = new List<string> ();
+	IOIOInterface ioioInterface;
 
 
 	void Awake ()
@@ -32,6 +34,8 @@ public class Control : MonoBehaviour
 		bigLabel.normal.textColor = Color.white;
 
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+		ioioInterface = GetComponent<IOIOInterface> ();
 	}
 
 
@@ -70,6 +74,16 @@ public class Control : MonoBehaviour
 			if (GUILayout.Button ("Quit", GUILayout.Width (150.0f), GUILayout.Height (150.0f)))
 			{
 				Application.Quit ();
+			}
+
+			if (GUILayout.Button ("Port 48: on", GUILayout.Width (150.0f), GUILayout.Height (150.0f)))
+			{
+				ioioInterface.ToggleDigitalOutput (48, true);
+			}
+
+			if (GUILayout.Button ("Port 48: off", GUILayout.Width (150.0f), GUILayout.Height (150.0f)))
+			{
+				ioioInterface.ToggleDigitalOutput (48, false);
 			}
 		}
 
