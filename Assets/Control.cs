@@ -1,10 +1,15 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+using Debug = UnityEngine.Debug;
 
 
 [RequireComponent (typeof (IOIOInterface))]
-public class Control : MonoBehaviour
+[RequireComponent (typeof (NetworkView))]
+public class Control : NetworkLogPairer
 {
 	const int kMaxLogLines = 10;
 
@@ -14,18 +19,32 @@ public class Control : MonoBehaviour
 
 	GUIStyle bigLabel;
 	bool interactive = false;
-	List<string> log = new List<string> ();
+	List<string> log = new List<string> (), logcatBuffer = new List<string> ();
 	IOIOInterface ioioInterface;
+	Process logcat;
+	int firstLogFrame = -1;
 
 
 	void Awake ()
 	{
 		Application.RegisterLogCallback (OnLog);
+		ioioInterface = GetComponent<IOIOInterface> ();
+		if (Application.platform == RuntimePlatform.Android)
+		{
+			server = true;
+		}
+		else
+		{
+			server = false;
+			ioioInterface.enabled = false;
+		}
 	}
 
 
-	void Start ()
+	protected override void Start ()
 	{
+		base.Start ();
+
 		bigLabel = new GUIStyle ()
 		{
 			name = "Big label",
@@ -35,17 +54,108 @@ public class Control : MonoBehaviour
 
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-		ioioInterface = GetComponent<IOIOInterface> ();
+		if (Application.platform != RuntimePlatform.Android)
+		{
+			ProcessStartInfo startInfo = new ProcessStartInfo ("/android-sdk-mac_86/platform-tools/adb", "logcat")
+			{
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+			};
+
+			logcat = Process.Start (startInfo);
+
+			logcat.OutputDataReceived += (object sender, DataReceivedEventArgs args) => {
+				int index = args.Data.IndexOf ("): ");
+				if (index > 0)
+				{
+					logcatBuffer.Add (args.Data.Substring (index + 3));
+				}
+			};
+
+			logcat.BeginOutputReadLine ();
+		}
+	}
+
+
+	void OnApplicationQuit ()
+	{
+		if (logcat != null && !logcat.HasExited)
+		{
+			logcat.Kill ();
+		}
+	}
+
+
+	protected override string[] ReadLog ()
+	{
+		if (logcat == null || logcatBuffer == null)
+		{
+			return new string[0];
+		}
+
+		if (firstLogFrame == -1)
+		{
+			firstLogFrame = Time.frameCount;
+
+			logcatBuffer.Clear ();
+
+			return new string[0];
+		}
+		else if (firstLogFrame == Time.frameCount)
+		{
+			logcatBuffer.Clear ();
+
+			return new string[0];
+		}
+
+		string[] result = logcatBuffer.ToArray ();
+
+		logcatBuffer.Clear ();
+
+		return result;
+	}
+
+
+	void OnConnectedToServer ()
+	{
+		Debug.Log ("Connected to device");
+		logcat.Kill ();
+		logcatBuffer.Clear ();
+	}
+
+
+	void OnPlayerConnected ()
+	{
+		Debug.Log ("Remote controller connected");
 	}
 
 
 	void OnLog (string message, string callStack, LogType type)
 	{
+		if (message.IndexOf (identifier) == 0)
+		{
+			return;
+		}
+
 		log.Insert (0, message);
 		while (log.Count > kMaxLogLines)
 		{
 			log.RemoveAt (log.Count - 1);
 		}
+	}
+
+
+	[RPC]
+	void Port48On ()
+	{
+		ioioInterface.ToggleDigitalOutput (48, true);
+	}
+
+
+	[RPC]
+	void Port48Off ()
+	{
+		ioioInterface.ToggleDigitalOutput (48, false);
 	}
 
 
@@ -78,16 +188,37 @@ public class Control : MonoBehaviour
 
 			if (GUILayout.Button ("Port 48: on", GUILayout.Width (150.0f), GUILayout.Height (150.0f)))
 			{
-				ioioInterface.ToggleDigitalOutput (48, true);
+				if (Network.isClient)
+				{
+					networkView.RPC ("Port48On", RPCMode.Server);
+				}
+				else
+				{
+					Port48On ();
+				}
 			}
 
 			if (GUILayout.Button ("Port 48: off", GUILayout.Width (150.0f), GUILayout.Height (150.0f)))
 			{
-				ioioInterface.ToggleDigitalOutput (48, false);
+				if (Network.isClient)
+				{
+					networkView.RPC ("Port48Off", RPCMode.Server);
+				}
+				else
+				{
+					Port48Off ();
+				}
 			}
 		}
 
-		if (Event.current.type == EventType.MouseDown)
+		if (Application.platform != RuntimePlatform.Android)
+		{
+			if (Event.current.type == EventType.Repaint)
+			{
+				interactive = Network.isClient;
+			}
+		}
+		else if (Event.current.type == EventType.MouseDown)
 		{
 			interactive = !interactive;
 		}
