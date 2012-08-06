@@ -36,6 +36,12 @@ public class IOIOInterface : MonoBehaviour
 	}
 
 
+	T JavaCall<T> (string method, params object[] arguments)
+	{
+		return InterfaceClass.CallStatic<T> (method, arguments);
+	}
+
+
 	public void StartInterface ()
 	{
 		JavaCall ("Start", gameObject.name);
@@ -60,15 +66,33 @@ public class IOIOInterface : MonoBehaviour
 	}
 
 
-	public void ToggleDigitalOutput (int pin, bool value = false)
+	public bool ToggleDigitalOutput (int pin, bool value)
 	{
-		JavaCall ("ToggleDigitalOutput", pin, value);
+		return JavaCall<bool> ("ToggleDigitalOutput", pin, value);
 	}
 
 
-	public void ClosePort (int pin)
+	public bool SetPWMCycleOutput (int pin, int frequency, float cycle)
 	{
-		JavaCall ("ClosePort");
+		return JavaCall<bool> ("SetPWMCycleOutput", pin, frequency, cycle);
+	}
+
+
+	public bool SetPWMWidthOutput (int pin, int frequency, int width)
+	{
+		return JavaCall<bool> ("SetPWMWidthOutput", pin, frequency, width);
+	}
+
+
+	public bool SetPWMPreciseWidthOutput (int pin, int frequency, float width)
+	{
+		return JavaCall<bool> ("SetPWMPreciseWidthOutput", pin, frequency, width);
+	}
+
+
+	public void Close (int pin)
+	{
+		JavaCall ("Close", pin);
 	}
 
 
