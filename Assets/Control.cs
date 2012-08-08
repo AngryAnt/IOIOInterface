@@ -159,6 +159,44 @@ public class Control : NetworkLogPairer
 	}
 
 
+	const int
+		kPinAIN1 = 41,
+		kPinAIN2 = 40,
+		kPinPWMA = 39,
+		kPinPWMB = 45,
+		kPinBIN2 = 44,
+		kPinBIN1 = 43,
+		kPinSTDBY = 42,
+		kPWMFreq = 100;
+
+
+	[RPC]
+	void MotorAForward ()
+	{
+		ioioInterface.SetPWMCycleOutput (kPinPWMA, kPWMFreq, 1.0f);
+		ioioInterface.ToggleDigitalOutput (kPinAIN1, true);
+		ioioInterface.ToggleDigitalOutput (kPinAIN2, false);
+		ioioInterface.ToggleDigitalOutput (kPinSTDBY, true);
+	}
+
+
+	[RPC]
+	void MotorABack ()
+	{
+		ioioInterface.SetPWMCycleOutput (kPinPWMA, kPWMFreq, 1.0f);
+		ioioInterface.ToggleDigitalOutput (kPinAIN1, false);
+		ioioInterface.ToggleDigitalOutput (kPinAIN2, true);
+		ioioInterface.ToggleDigitalOutput (kPinSTDBY, true);
+	}
+
+
+	[RPC]
+	void MotorAStop ()
+	{
+		ioioInterface.ToggleDigitalOutput (kPinSTDBY, false);
+	}
+
+
 	void OnGUI ()
 	{
 		GUI.contentColor = Color.white;
@@ -184,6 +222,42 @@ public class Control : NetworkLogPairer
 			if (GUILayout.Button ("Quit", GUILayout.Width (150.0f), GUILayout.Height (150.0f)))
 			{
 				Application.Quit ();
+			}
+
+			if (GUILayout.Button ("Forward"))
+			{
+				if (Network.isClient)
+				{
+					networkView.RPC ("MotorAForward", RPCMode.Server);
+				}
+				else
+				{
+					MotorAForward ();
+				}
+			}
+
+			if (GUILayout.Button ("Back"))
+			{
+				if (Network.isClient)
+				{
+					networkView.RPC ("MotorABack", RPCMode.Server);
+				}
+				else
+				{
+					MotorABack ();
+				}
+			}
+
+			if (GUILayout.Button ("Stop"))
+			{
+				if (Network.isClient)
+				{
+					networkView.RPC ("MotorAStop", RPCMode.Server);
+				}
+				else
+				{
+					MotorAStop ();
+				}
 			}
 
 			if (GUILayout.Button ("Port 48: on", GUILayout.Width (150.0f), GUILayout.Height (150.0f)))
