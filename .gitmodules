@@ -1,0 +1,3 @@
+[submodule "Assets/JavaPluginBuilder"]
+	path = Assets/JavaPluginBuilder
+	url = https://angryant@github.com/AngryAnt/JavaPluginBuilder.git
