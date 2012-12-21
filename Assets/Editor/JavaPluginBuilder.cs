@@ -100,15 +100,6 @@ public class JavaPluginBuilder : AssetPostprocessor
 
 	static bool RunBuildProcess (ProcessStartInfo startInfo, string errorPrefix = "")
 	{
-		Debug.Log (
-			string.Format (
-				"Running {0} in {1} with arguments {2}",
-				startInfo.FileName,
-				startInfo.WorkingDirectory,
-				startInfo.Arguments
-			)
-		);
-
 		Process process = Process.Start (startInfo);
 		process.WaitForExit ();
 
